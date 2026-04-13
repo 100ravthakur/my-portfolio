@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import "../header.css";
+import bgImage from "/assets/trio.jpg"; 
 
 /* ─────────────────────────────────────────
    NAV LINKS
@@ -193,6 +194,7 @@ function Header() {
         {/* ── BG image layer ── */}
         <div
           className="hdr-bg-image"
+          style={{ backgroundImage: `url(${bgImage})` }}
           aria-hidden="true"
         />
 
