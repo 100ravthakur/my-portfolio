@@ -217,6 +217,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+  background-image: url("./assets/trio.jpg");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
