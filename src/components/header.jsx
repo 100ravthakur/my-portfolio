@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import "../header.css";
-import bgImage from "../assets/hero-bg.png"; // ← your manga silhouette image
+import bgImage from "../../public/image/trio.jpg"; // ← your manga silhouette image
 
 /* ─────────────────────────────────────────
    NAV LINKS
