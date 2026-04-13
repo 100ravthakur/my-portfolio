@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import "../header.css";
-import bgImage from "../assets/monkey-d-luffy.png"; 
+import bgImage from "../assets/monkey-d-luffy-one.png"; 
 
 /* ─────────────────────────────────────────
    NAV LINKS
