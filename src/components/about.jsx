@@ -74,7 +74,7 @@ export default function About() {
 
   {/* Connect button */}
   <a
-    href="https://wa.me/91XXXXXXXXXX"
+    href="https://wa.me/916266045950"
     target="_blank"
     rel="noopener noreferrer"
     className="about-btn-ghost"
