@@ -204,7 +204,7 @@ function WHM() {
 
           <div className="whm-img-frame">
             {/* ── Replace the src below with your own photo ── */}
-            <img src="../../public/image/Asta.jpg" alt="Sourabh Bhaisare" className="whm-img" />
+            <img src="/image/Asta.jpg" alt="Sourabh Bhaisare" className="whm-img" />
 
             {/* Placeholder shown when no photo is provided */}
             {/* <div className="whm-img-placeholder">

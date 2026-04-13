@@ -84,7 +84,7 @@ export default function CTA() {
 
           {/* ── Left: image panel ── */}
         <div className="cta-image-panel">
-                      <img src="../../public/image/HINATA SHOYO.jpg" alt="Sourabh Bhaisare" />
+                      <img src="/image/HINATA SHOYO.jpg" alt="Sourabh Bhaisare" />
          
           {/* <div className="cta-img-placeholder">
             <div className="cta-img-initials">SB</div>

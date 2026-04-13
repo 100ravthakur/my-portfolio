@@ -15,7 +15,7 @@ export default function About() {
         <div className="about-img-frame">
           {/* Replace src with your actual photo */}
           <img
-            src="../../public/image/uzumaki.jpg"
+            src="/image/uzumaki.jpg"
             alt="Sourabh Bhaisare"
           />
         </div>
