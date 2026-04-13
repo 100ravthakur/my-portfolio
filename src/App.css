@@ -1934,3 +1934,11 @@ section#intro::after {
   text-decoration: underline;
   opacity: 0.8;
 }
+@media (max-width: 960px) {
+  .cta-wrapper {
+    width: 100%;
+  padding: 10px;}
+  .headline {
+    font-size: 2.5rem;
+  }
+}
