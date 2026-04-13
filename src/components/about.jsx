@@ -61,12 +61,28 @@ export default function About() {
 
         {/* Actions */}
         <div className="about-actions">
-          <button className="about-btn-primary">
-            Download CV
-            <span className="arrow">↓</span>
-          </button>
-          <button className="about-btn-ghost">Let's Connect</button>
-        </div>
+
+  {/* Download CV */}
+  <a
+    href="/Sourabh Bhaisare CV_.pdf"
+    download
+    className="about-btn-primary"
+  >
+    Download CV
+    <span className="arrow">↓</span>
+  </a>
+
+  {/* Connect button */}
+  <a
+    href="https://wa.me/91XXXXXXXXXX"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="about-btn-ghost"
+  >
+    Let's Connect
+  </a>
+
+</div>
       </div>
     </section>
   );

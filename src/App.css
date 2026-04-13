@@ -398,6 +398,7 @@ section#intro::after {
   font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 700;
+  text-decoration: none;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   background: var(--orange);
@@ -419,6 +420,7 @@ section#intro::after {
   font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 600;
+  text-decoration: none;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   background: transparent;
