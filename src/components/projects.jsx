@@ -37,7 +37,7 @@ const wordpressProjects = [
   },
   {
     id: "wp4",
-    title: "Bulleye",
+    title: "Bullseye",
     category: "WordPress",
     desc: "Created and updated web pages using WordPress and Elementor. Focused on responsive design, UI improvements, and maintaining overall website performance.",
     tags: ["WordPress", "Elementor", "HTML", "CSS", "JavaScript"],
