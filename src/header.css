@@ -91,6 +91,10 @@
   gap: 3px;
   transition: color 0.25s ease, background 0.25s ease;
 }
+
+nav.hdr-nav.hdr-nav--scrolled {
+    height: 60px;
+}
 .hdr-nav__link:hover {
   color: #fff;
   /* background: rgba(255, 255, 255, 0.06); */
