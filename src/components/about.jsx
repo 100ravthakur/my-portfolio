@@ -64,7 +64,7 @@ export default function About() {
 
   {/* Download CV */}
   <a
-    href="/Sourabh Bhaisare CV_.pdf"
+    href="/Sourabh Bhaisare CV_ new.pdf"
     download
     className="about-btn-primary"
   >
