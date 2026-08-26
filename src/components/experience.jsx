@@ -10,7 +10,7 @@ const expData = [
     duration: "Current",
     description:
       "Front-End Developer building scalable interfaces across WordPress, HubSpot CMS, and .NET platforms. Focused on responsive UI, performance optimization, and SEO improvements.",
-    tags: ["HTML/CSS", "JavaScript", "WordPress", "HubSpot CMS", "SEO"],
+    tags: ["HTML/CSS", "JavaScript", "WordPress", "HubSpot CMS", "OpenCMS"],
     img: "/image/naruto attack.jpg",
     accent: "#ff5500",
   },
