@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&family=Parkinsans:wght@300..800&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 /* ============================================================
    RESET & ROOT
 ============================================================ */
@@ -19,9 +18,9 @@
   --muted:     #444;
   --muted2:    #666;
   --border:    rgba(255, 85, 0, 0.15);
-  --font-display: 'Syne', sans-serif;
-  --font-mono:    'Inter', monospace;
-  --font-body:    'Inter', sans-serif;
+  --font-display: 'Mona Sans', sans-serif;
+  --font-mono:    'Public Sans', monospace;
+  --font-body:    'Public Sans', sans-serif;
 }
 
 html {
@@ -145,7 +144,7 @@ section#intro::after {
 .intro-content h1 {
   font-family: var(--font-display) !important;
   font-size: clamp(3.5rem, 6vw, 7rem) !important;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 100px;
   letter-spacing: -0.04em;
   text-align: center;
@@ -220,7 +219,7 @@ section#intro::after {
   position: absolute;
   font-family: var(--font-display);
   font-size: 18vw;
-  font-weight: 800;
+  font-weight: 700;
   color: rgba(255, 85, 0, 0.03);
   top: 50%;
   left: 50%;
@@ -283,7 +282,7 @@ section#intro::after {
 .stat-num {
   font-family: var(--font-display);
   font-size: 2.8rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--orange);
   line-height: 1;
   display: block;
@@ -330,7 +329,7 @@ section#intro::after {
 .about-heading {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 4vw, 4.5rem);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--white);
   line-height: 1;
   letter-spacing: -0.04em;
@@ -484,7 +483,7 @@ section#intro::after {
 .skill-header h2 {
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 5vw, 4rem);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--white);
   letter-spacing: -0.03em;
 }
@@ -733,7 +732,7 @@ section#intro::after {
 .exp-header__title {
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 5vw, 4rem);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--white);
   letter-spacing: -0.03em;
   margin-bottom: 16px;
@@ -903,7 +902,7 @@ section#intro::after {
 .exp-card__role {
   font-family: var(--font-display);
   font-size: 1.2rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
   line-height: 1.2;
 }
@@ -1028,7 +1027,7 @@ section#intro::after {
 .proj-header__title {
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 5vw, 4rem);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--white);
   letter-spacing: -0.03em;
   line-height: 1.1;
@@ -1067,7 +1066,7 @@ section#intro::after {
 .proj-section-title__h2 {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--white);
   letter-spacing: -0.02em;
   margin-bottom: 14px;
@@ -1420,7 +1419,7 @@ section#intro::after {
 .whm-initials {
   font-family: var(--font-display);
   font-size: 6rem;
-  font-weight: 800;
+  font-weight: 700;
   color: rgba(255, 85, 0, 0.12);
   letter-spacing: -0.05em;
   line-height: 1;
@@ -1472,7 +1471,7 @@ section#intro::after {
 .whm-stat--1 { top: 10%;  left: -20px; }
 .whm-stat--2 { bottom: 22%; right: -20px; }
 .whm-stat--3 { bottom: 5%;  left: 10%; }
-.whm-stat__value { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; color: var(--orange); line-height: 1; }
+.whm-stat__value { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: var(--orange); line-height: 1; }
 .whm-stat__label { font-family: var(--font-body); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted2); white-space: nowrap; }
 
 .whm-content {
@@ -1503,7 +1502,7 @@ section#intro::after {
 .whm-title {
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 3.5vw, 2.8rem);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--white);
   letter-spacing: -0.03em;
   line-height: 1.15;
@@ -1710,7 +1709,7 @@ section#intro::after {
 .cta-img-initials {
   font-family: var(--font-display);
   font-size: 5rem;
-  font-weight: 800;
+  font-weight: 700;
   color: rgba(255, 85, 0, 0.1);
   letter-spacing: -0.05em;
 }
@@ -1795,7 +1794,7 @@ section#intro::after {
   letter-spacing: -0.03em;
   color: var(--white);
   margin: 0 0 6px;
-  font-weight: 800;
+  font-weight: 700;
   opacity: 0;
   animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
 }
