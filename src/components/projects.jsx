@@ -4,48 +4,48 @@ import "../App.css";
 /* ─────────────────────────────────────────
    DATA — Real projects from resume
 ───────────────────────────────────────── */
-const wordpressProjects = [
-  {
-    id: "wp1",
-    title: "Prateek Group",
-    category: ".NET · Frontend",
-    desc: "Worked on a corporate website using .NET with HTML, CSS, and JavaScript. Built responsive pages, handled UI updates, and maintained performance-focused layouts.",
-    tags: [".NET", "HTML", "CSS", "JavaScript"],
-    img: "/image/net.jpg",
-    link: "https://prateekgroup.com/",
-    color: "#ff5500",
-  },
-  {
-    id: "wp2",
-    title: "Calance",
-    category: "HubSpot CMS",
-    desc: "Developed and maintained marketing pages using HTML, CSS, JavaScript, and HubL. Focused on responsive design, content updates, and smooth UI performance.",
-    tags: ["HubL", "HTML", "CSS", "JavaScript"],
-    img: "/image/HubSpot.jpg",
-    link: "https://www.calanceus.com/",
-    color: "#ff7733",
-  },
-  {
-    id: "wp3",
-    title: "Kaivalyadhama",
-    category: "WordPress",
-    desc: "Built and managed website pages using WordPress and Elementor. Handled content updates, responsive layouts, and ensured stable performance across devices.",
-    tags: ["WordPress", "Elementor", "HTML", "CSS", "JavaScript"],
-    img: "/image/wordpress img.jpg",
-    link: "https://kdham.com/",
-    color: "#ff9955",
-  },
-  {
-    id: "wp4",
-    title: "Bullseye",
-    category: "WordPress",
-    desc: "Created and updated web pages using WordPress and Elementor. Focused on responsive design, UI improvements, and maintaining overall website performance.",
-    tags: ["WordPress", "Elementor", "HTML", "CSS", "JavaScript"],
-    img: "/image/wordpress img.jpg",
-    link: "https://beta.bullseyeengagement.com/",
-    color: "#ffbb44",
-  },
-];
+// const wordpressProjects = [
+//   {
+//     id: "wp1",
+//     title: "Prateek Group",
+//     category: ".NET · Frontend",
+//     desc: "Worked on a corporate website using .NET with HTML, CSS, and JavaScript. Built responsive pages, handled UI updates, and maintained performance-focused layouts.",
+//     tags: [".NET", "HTML", "CSS", "JavaScript"],
+//     img: "/image/net.jpg",
+//     link: "https://prateekgroup.com/",
+//     color: "#ff5500",
+//   },
+//   {
+//     id: "wp2",
+//     title: "Calance",
+//     category: "HubSpot CMS",
+//     desc: "Developed and maintained marketing pages using HTML, CSS, JavaScript, and HubL. Focused on responsive design, content updates, and smooth UI performance.",
+//     tags: ["HubL", "HTML", "CSS", "JavaScript"],
+//     img: "/image/HubSpot.jpg",
+//     link: "https://www.calanceus.com/",
+//     color: "#ff7733",
+//   },
+//   {
+//     id: "wp3",
+//     title: "Kaivalyadhama",
+//     category: "WordPress",
+//     desc: "Built and managed website pages using WordPress and Elementor. Handled content updates, responsive layouts, and ensured stable performance across devices.",
+//     tags: ["WordPress", "Elementor", "HTML", "CSS", "JavaScript"],
+//     img: "/image/wordpress img.jpg",
+//     link: "https://kdham.com/",
+//     color: "#ff9955",
+//   },
+//   {
+//     id: "wp4",
+//     title: "Bullseye",
+//     category: "WordPress",
+//     desc: "Created and updated web pages using WordPress and Elementor. Focused on responsive design, UI improvements, and maintaining overall website performance.",
+//     tags: ["WordPress", "Elementor", "HTML", "CSS", "JavaScript"],
+//     img: "/image/wordpress img.jpg",
+//     link: "https://beta.bullseyeengagement.com/",
+//     color: "#ffbb44",
+//   },
+// ];
 
 const personalProjects = [
   {
@@ -288,7 +288,7 @@ function Projects() {
         </div>
 
         {/* ══ WORDPRESS PROJECTS ══ */}
-        <div ref={wpTitleRef}>
+        {/* <div ref={wpTitleRef}>
           <ProjSectionTitle
             label="Client Work"
             title="WordPress Projects"
@@ -303,7 +303,7 @@ function Projects() {
               <ProjCard data={item} index={i} visible={wpVisible[i]} />
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* ══ PERSONAL PROJECTS ══ */}
         <div ref={pTitleRef} style={{ marginTop: "80px" }}>
