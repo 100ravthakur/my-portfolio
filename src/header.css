@@ -2,7 +2,7 @@
    HEADER + NAVBAR  —  hdr- prefix
    Manga silhouette background, centered content, full animations
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&family=Parkinsans:wght@300..800&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+/* fonts loaded in App.css */
 /* ════════════════════════════════════════
    CSS VARIABLES
 ════════════════════════════════════════ */
@@ -49,7 +49,7 @@
 
 /* Logo */
 .hdr-nav__logo {
-  font-family: 'Mona Sans', sans-serif;
+  font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -76,7 +76,7 @@
 
 .hdr-nav__link {
   position: relative;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.82rem;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -116,7 +116,7 @@ nav.hdr-nav.hdr-nav--scrolled {
 /* CTA */
 .hdr-nav__cta {
   flex-shrink: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -179,7 +179,7 @@ nav.hdr-nav.hdr-nav--scrolled {
   pointer-events: auto;
 }
 .hdr-nav__drawer-link {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.45);
@@ -202,439 +202,383 @@ nav.hdr-nav.hdr-nav--scrolled {
 }
 
 /* ════════════════════════════════════════
-   HERO SECTION
+   HERO — manga cover, 3D stage (h3d- prefix)
+   Layers, back to front: bg image → shade → speed lines → halftone
+   → tilting stage (sticker, extruded name, orbiting stack, caption, actions)
 ════════════════════════════════════════ */
-.hdr-section {
+.h3d {
+  --ink:    #000;
+  --bone:   #f3ecdc;
+  --straw:  #f6c445;
+  --crimson:#c8102e;
+  --paper-shadow: 6px 6px 0 var(--ink);
+
   position: relative;
   min-height: 100vh;
-  background: var(--hdr-bg);
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
   overflow: hidden;
-  font-family: 'Inter', sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #120405;
+  color: var(--bone);
+  font-family: var(--font-body);
+  cursor: grab;
+  touch-action: pan-y;
+  isolation: isolate;
 }
+.h3d--grabbing { cursor: grabbing; }
+.h3d--grabbing * { user-select: none; }
 
-/* ── Background image ── */
-.hdr-bg-image {
+/* ── Background image (yours), parallaxed by JS ── */
+.h3d__bg {
   position: absolute;
-  inset: 0;
-  z-index: 0;
+  inset: -4%;
   background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  background-position: center right;
+  transform: scale(1.1);
+  will-change: transform;
+  z-index: -4;
+  animation: h3d-bg-in 1.6s cubic-bezier(.2,.7,.1,1) both;
+}
+@keyframes h3d-bg-in {
+  from { filter: grayscale(1) brightness(0.3); }
+  to   { filter: none; }
 }
 
-/* ── Dark overlay — keeps characters visible, text readable ── */
-.hdr-overlay {
+/* readable centre, darker edges, keeps the red of the art */
+.h3d__shade {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: -3;
   background:
-    radial-gradient(
-      ellipse 55% 65% at 50% 50%,
-      rgba(8, 12, 18, 0.42) 0%,
-      rgba(8, 12, 18, 0.00) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(8, 12, 18, 0.80) 0%,
-      rgba(8, 12, 18, 0.12) 28%,
-      rgba(8, 12, 18, 0.12) 68%,
-      rgba(8, 12, 18, 0.90) 100%
-    );
-  pointer-events: none;
+    radial-gradient(ellipse 48% 42% at 50% 50%, rgba(0,0,0,0.62), rgba(0,0,0,0.25) 70%, transparent),
+    linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0.85) 100%);
 }
 
-/* ── Edge vignette ── */
-.hdr-vignette {
+/* manga speed lines radiating from the name */
+.h3d__speed {
   position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: radial-gradient(
-    ellipse 100% 100% at 50% 50%,
-    transparent 50%,
-    rgba(8, 12, 18, 0.48) 100%
-  );
-  pointer-events: none;
-}
-
-/* ── Grid lines ── */
-.hdr-grid-lines {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 60px 60px;
-  animation: hdr-gridDrift 40s linear infinite;
-  pointer-events: none;
-}
-@keyframes hdr-gridDrift { to { background-position: 60px 60px; } }
-
-/* ════════════════════════════════════════
-   FLOATING PARTICLES
-════════════════════════════════════════ */
-.hdr-particles {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.hdr-particle {
-  position: absolute;
-  border-radius: 50%;
-  animation: hdr-particleFloat linear infinite;
+  left: 50%; top: 50%;
+  width: 260vmax; height: 260vmax;
+  margin: -130vmax 0 0 -130vmax;
+  z-index: -2;
+  background: repeating-conic-gradient(from 0deg,
+    rgba(243,236,220,0.10) 0deg 0.6deg,
+    transparent 0.6deg 4.5deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 14%, #000 30%, transparent 62%);
+          mask-image: radial-gradient(circle, transparent 14%, #000 30%, transparent 62%);
+  animation: h3d-spin 90s linear infinite;
   opacity: 0;
+  visibility: hidden;
 }
-@keyframes hdr-particleFloat {
-  0%   { opacity: 0;   transform: translateY(0)      scale(0); }
-  10%  { opacity: 1; }
-  88%  { opacity: 0.3; }
-  100% { opacity: 0;   transform: translateY(-130px)  scale(1.6); }
+@keyframes h3d-spin { to { rotate: 360deg; } }
+
+/* print halftone over the lower part */
+.h3d__halftone {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.6) 1.1px, transparent 1.5px);
+  background-size: 7px 7px;
+  -webkit-mask-image: linear-gradient(180deg, transparent 45%, #000 100%);
+          mask-image: linear-gradient(180deg, transparent 45%, #000 100%);
+  pointer-events: none;
 }
 
-/* ════════════════════════════════════════
-   TECH CHIPS — left & right columns
-════════════════════════════════════════ */
-.hdr-chips {
+/* vertical Japanese caption, left edge */
+.h3d__vertical {
   position: absolute;
-  top: 0; bottom: 0;
-  z-index: 8;
+  left: clamp(14px, 3vw, 44px);
+  top: 50%;
+  translate: 0 -50%;
+  margin: 0;
+  writing-mode: vertical-rl;
+  font-family: 'Dela Gothic One', var(--font-display);
+  font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+  letter-spacing: 0.35em;
+  color: var(--straw);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* ── 3D scene ── */
+.h3d__scene {
+  position: relative;
+  width: 100%;
+  perspective: 1300px;
+  perspective-origin: 50% 45%;
+  padding: 110px 20px 90px;
+}
+.h3d__stage {
+  position: relative;
+  transform-style: preserve-3d;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-  padding: 120px 0 60px;
-  pointer-events: none;
+  align-items: center;
+  will-change: transform;
 }
-.hdr-chips--left  { left:  2%; align-items: flex-start; }
-.hdr-chips--right { right: 2%; align-items: flex-end; }
+.h3d__depth { transform-style: preserve-3d; }
+.h3d__depth--sticker { transform: translateZ(150px); margin-bottom: 0; }
+.h3d__depth--caption { transform: translateZ(90px);  margin-top: 8px; }
+.h3d__depth--actions { transform: translateZ(130px); margin-top: 28px; }
 
-.hdr-chip {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 6px 14px;
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(8, 12, 18, 0.72);
-  color: rgba(255, 255, 255, 0.62);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+/* sticker badge, slapped on at an angle */
+.h3d__sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 16px;
+  background: var(--straw);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  font-weight: 700;
+  font-size: 0.9rem;
+  rotate: -4deg;
   opacity: 0;
-  animation: hdr-chipFloat ease-in-out infinite alternate;
+  visibility: hidden;
+}
+.h3d__sticker-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #16a34a;
+  border: 2px solid var(--ink);
+}
+
+/* ── Extruded name ── */
+.h3d__name {
+  position: relative;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.02em;
+  transform-style: preserve-3d;
+  font-family: 'Dela Gothic One', var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 9.4vw, 8.6rem);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+.h3d__slam {
+  display: block;
+  transform-style: preserve-3d;
+  transform: translateY(-140vh) rotateX(70deg) scale(1.6);
+}
+
+.h3d-word {
+  position: relative;
+  display: block;
+  transform-style: preserve-3d;
   white-space: nowrap;
 }
-@keyframes hdr-chipFloat {
-  0%   { opacity: 0;    transform: translateY(8px); }
-  25%  { opacity: 1; }
-  100% { opacity: 0.72; transform: translateY(-8px); }
-}
-
-/* ════════════════════════════════════════
-   HERO CONTENT — center column
-════════════════════════════════════════ */
-.hdr-content {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 120px 24px 80px;
-  max-width: 780px;
-  width: 100%;
-}
-
-/* ── Badge ── */
-.hdr-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.70rem;
-  font-weight: 500;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.80);
-  background: rgba(8, 12, 18, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 8px 20px;
-  border-radius: 50px;
-  margin-bottom: 28px;
-  opacity: 0;
-  transform: translateY(-14px);
-  transition: opacity 0.7s cubic-bezier(0.34, 1.2, 0.64, 1) 0.3s,
-              transform 0.7s cubic-bezier(0.34, 1.2, 0.64, 1) 0.3s;
-}
-.hdr-badge--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.hdr-badge__dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--hdr-green);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
-  flex-shrink: 0;
-  animation: hdr-blink 2s ease-in-out infinite;
-}
-@keyframes hdr-blink {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25); }
-  50%       { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0.07); }
-}
-
-/* ── "Hi I'm" ── */
-.hdr-hi {
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.52);
-  margin-bottom: 12px;
-  opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.7s ease 0.5s, transform 0.7s ease 0.5s;
-}
-.hdr-hi--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── Name ── */
-.hdr-name {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(3rem, 8vw, 6.4rem);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.01em;
-  color: #fff;
-  margin-bottom: 20px;
-  text-shadow:
-    0 4px 40px rgba(0, 0, 0, 0.85),
-    0 0  80px rgba(0, 0, 0, 0.60);
-  opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.7s,
-              transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.7s;
-}
-.hdr-name--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hdr-name__accent {
-  color: var(--hdr-orange);
-  position: relative;
-  display: inline-block;
-  -webkit-text-stroke: 1px rgba(255, 107, 53, 0.45);
-}
-.hdr-name__accent::after {
-  content: '';
+.h3d-word__face { position: relative; display: block; transform: translateZ(1px); }
+.h3d-word__layer {
   position: absolute;
-  bottom: -4px; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--hdr-orange), transparent);
-  border-radius: 2px;
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: hdr-lineReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1.8s forwards;
+  inset: 0;
+  transform: translateZ(calc(var(--z) * -3px));
 }
-@keyframes hdr-lineReveal { to { transform: scaleX(1); } }
+/* line 1: bone face, ink extrusion */
+.h3d-word--solid .h3d-word__face  { color: var(--bone); }
+.h3d-word--solid .h3d-word__layer { color: #1a0d08; }
+.h3d-word--solid .h3d-word__layer:first-child { color: #000; text-shadow: 0 18px 30px rgba(0,0,0,0.6); }
+/* line 2: straw-yellow face with ink outline, crimson extrusion */
+.h3d-word--ink .h3d-word__face {
+  color: var(--straw);
+  -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
+}
+.h3d-word--ink .h3d-word__layer { color: #6e0a17; }
+.h3d-word--ink .h3d-word__layer:first-child { color: #000; text-shadow: 0 18px 30px rgba(0,0,0,0.6); }
 
-/* ── Role ticker wrapper ── */
-.hdr-ticker-wrap {
-  height: 44px;
-  overflow: hidden;
-  margin-bottom: 24px;
+/* ── Name + orbit share one 3D box so the ring centres on the name ── */
+.h3d__namewrap {
+  position: relative;
+  transform-style: preserve-3d;
+  margin: 44px 0 68px;
+}
+
+/* ── Orbiting tech stack (positions set by JS) ── */
+.h3d__orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0; height: 0;
+  margin: 0; padding: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.h3d__orbit-item {
+  position: absolute;
+  left: 0; top: 0;
+  translate: -50% -50%;
+  padding: 6px 12px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 0.9vw, 0.82rem);
+  font-weight: 500;
+  color: var(--bone);
+  background: rgba(0, 0, 0, 0.78);
+  border: 1px solid rgba(243, 236, 220, 0.28);
   opacity: 0;
-  transition: opacity 0.7s ease 1.1s;
+  will-change: transform, opacity;
 }
-.hdr-ticker-wrap--visible { opacity: 1; }
+.h3d__orbit-item[data-front="1"] {
+  color: var(--ink);
+  background: var(--bone);
+  border-color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
 
-/* ── Role pill ── */
-.hdr-role-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+/* ── Caption box (manga narration panel) ── */
+.h3d__caption {
+  position: relative;
+  max-width: 34rem;
+  padding: 16px 22px 18px;
+  background: var(--bone);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: var(--paper-shadow);
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
 }
-.hdr-role-pill {
-  display: inline-block;
-  font-family: 'Inter', sans-serif;
+.h3d__role {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
   font-size: 0.78rem;
+  overflow: hidden;
+}
+.h3d__role-label { color: var(--crimson); font-weight: 600; }
+.h3d__role-text {
+  display: inline-block;
   font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #fff;
-  border: 1px solid rgba(255, 107, 53, 0.40);
-  background: rgba(8, 12, 18, 0.58);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 8px 24px;
-  border-radius: 50px;
-  transition: transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.35s ease;
+  transition: opacity 0.3s ease, transform 0.35s ease;
 }
-.hdr-role-pill--out {
-  opacity: 0 !important;
-  transform: translateY(-10px);
-}
-.hdr-role-pill--in {
-  opacity: 1;
-  transform: translateY(0);
+.h3d__role-text--out { transform: translateY(-100%); }
+.h3d__role-text--in  { animation: h3d-role-in 0.45s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes h3d-role-in { from { transform: translateY(100%); } to { transform: none; } }
+.h3d__lead {
+  margin: 0;
+  font-size: clamp(0.98rem, 1.3vw, 1.1rem);
+  font-weight: 500;
+  line-height: 1.5;
 }
 
-/* ── Description ── */
-.hdr-desc {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 400;
-  line-height: 1.80;
-  color: rgba(255, 255, 255, 0.60);
-  max-width: 480px;
-  margin-bottom: 36px;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
-  background: rgba(8, 12, 18, 0.38);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  padding: 12px 20px;
-  border-radius: 12px;
-  opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.7s ease 1.2s, transform 0.7s ease 1.2s;
-}
-.hdr-desc--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── CTA buttons ── */
-.hdr-actions {
+/* ── Buttons: printed stickers that press down ── */
+.h3d__actions {
   display: flex;
-  gap: 14px;
-  justify-content: center;
   flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
   opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.7s ease 1.4s, transform 0.7s ease 1.4s;
+  visibility: hidden;
 }
-.hdr-actions--visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hdr-btn {
+.h3d__btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 13px 30px;
-  border-radius: 50px;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  height: 50px;
+  padding: 0 26px;
+  border: 2px solid var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
   text-decoration: none;
-  transition:
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.3s ease;
+  box-shadow: 5px 5px 0 var(--ink);
+  transition: box-shadow 0.12s ease, background 0.2s ease;
+  will-change: transform;
 }
-.hdr-btn:hover { transform: translateY(-3px); }
+.h3d__btn:hover  { box-shadow: 7px 7px 0 var(--ink); }
+.h3d__btn:active { box-shadow: 0 0 0 var(--ink); }
+.h3d__btn:focus-visible { outline: 3px solid var(--straw); outline-offset: 4px; }
+.h3d__btn--primary { background: var(--straw); color: var(--ink); }
+.h3d__btn--primary:hover { color: var(--ink); }
+.h3d__btn--ghost   { background: var(--ink); color: var(--bone); border-color: var(--bone); box-shadow: 5px 5px 0 rgba(243,236,220,0.35); }
+.h3d__btn--ghost:hover { color: var(--bone); box-shadow: 7px 7px 0 rgba(243,236,220,0.35); }
 
-.hdr-btn--primary {
-  background: var(--hdr-orange);
-  color: #fff;
-  box-shadow: 0 8px 24px var(--hdr-orange-glow);
-}
-.hdr-btn--primary:hover {
-  box-shadow: 0 16px 40px rgba(255, 107, 53, 0.58);
-}
-.hdr-btn--primary svg {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.hdr-btn--primary:hover svg { transform: translateX(5px); }
-
-.hdr-btn--ghost {
-  background: rgba(8, 12, 18, 0.58);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-.hdr-btn--ghost:hover {
-  border-color: var(--hdr-orange);
-  color: var(--hdr-orange);
-  background: rgba(255, 107, 53, 0.08);
-}
-
-/* ════════════════════════════════════════
-   SCROLL CUE
-════════════════════════════════════════ */
-.hdr-scroll-cue {
+.h3d__hint {
   position: absolute;
-  bottom: 28px; left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  z-index: 20;
+  bottom: 22px;
+  left: 50%;
+  translate: -50% 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: rgba(243, 236, 220, 0.45);
   opacity: 0;
-  transition: opacity 1s ease 2.2s;
-}
-.hdr-scroll-cue--visible { opacity: 1; }
-
-.hdr-scroll-cue__label {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.22);
+  visibility: hidden;
+  pointer-events: none;
 }
 
-.hdr-scroll-cue__arrows {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  animation: hdr-arrowBounce 1.8s ease-in-out infinite;
+
+/* ── ドン — manga sound effect that lands with the name ── */
+.h3d__don-wrap {
+  position: absolute;
+  right: -9%;
+  top: -0.55em;
+  font-size: clamp(3rem, 8vw, 7.4rem);
+  transform: translateZ(40px);
+  transform-style: preserve-3d;
+  pointer-events: none;
+  z-index: 2;
 }
-.hdr-scroll-cue__arrows span {
+.h3d__don {
   display: block;
-  width: 10px; height: 10px;
-  border-right: 2px solid rgba(255, 107, 53, 0.50);
-  border-bottom: 2px solid rgba(255, 107, 53, 0.50);
-  transform: rotate(45deg);
-}
-.hdr-scroll-cue__arrows span:nth-child(2) {
-  opacity: 0.42;
-  margin-top: -5px;
-}
-@keyframes hdr-arrowBounce {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(7px); }
+  font-family: 'Dela Gothic One', var(--font-display);
+  line-height: 1;
+  color: var(--ink);
+  -webkit-text-stroke: 0.06em var(--bone);
+  paint-order: stroke fill;
+  text-shadow: 0.05em 0.05em 0 var(--crimson);
+  transform: rotate(12deg);
+  opacity: 0;
+  visibility: hidden;
 }
 
-/* ════════════════════════════════════════
-   RESPONSIVE
-════════════════════════════════════════ */
-@media (max-width: 900px) {
-  .hdr-chips { display: none; }
+/* ── Impact frame (anime hit) ──
+   For ~0.1s GSAP sets filter: grayscale + contrast + invert on the whole hero.
+   These lines are white so the invert turns them into black ink. */
+.h3d__impact {
+  position: absolute;
+  inset: -60%;
+  visibility: hidden;
+  pointer-events: none;
+  background: repeating-conic-gradient(from 3deg, #fff 0deg 1.4deg, transparent 1.4deg 5.5deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 16%, #000 34%);
+          mask-image: radial-gradient(circle, transparent 16%, #000 34%);
 }
 
-@media (max-width: 700px) {
-  .hdr-content { padding: 100px 20px 60px; }
-  .hdr-name    { font-size: clamp(2.6rem, 13vw, 4.2rem); }
-  .hdr-desc    { font-size: 0.88rem; max-width: 100%; }
-  .hdr-actions { flex-direction: column; align-items: center; }
-  .hdr-btn     { width: 100%; max-width: 280px; justify-content: center; }
+/* ── Small screens ── */
+@media (max-width: 760px) {
+  .h3d__vertical { display: none; }
+  .h3d__scene { padding: 96px 16px 72px; }
+  .h3d__depth--sticker { transform: translateZ(90px); }
+  .h3d__depth--caption { transform: translateZ(60px); margin-top: 4px; }
+  .h3d__depth--actions { transform: translateZ(80px); }
+  .h3d__caption { padding: 14px 16px; }
+  .h3d__actions { width: 100%; }
+  .h3d__btn { flex: 1 1 140px; justify-content: center; }
+  .h3d__namewrap { margin: 22px 0 78px; }
+  .h3d__name { font-size: clamp(2.6rem, 12.4vw, 3.4rem); }
+  .h3d__orbit-item { font-size: 0.66rem; padding: 4px 8px; }
+  .h3d__btn { padding: 0 16px; white-space: nowrap; font-size: 0.95rem; }
+  .h3d-word--ink .h3d-word__face { -webkit-text-stroke-width: 1.5px; }
+  .h3d__don-wrap { right: 2%; top: -0.66em; font-size: clamp(2.2rem, 11vw, 3rem); }
+}
+@media (hover: none) { .h3d__hint { display: none; } .h3d { cursor: auto; } }
+
+/* ── Reduced motion: everything in place, nothing moves ── */
+@media (prefers-reduced-motion: reduce) {
+  .h3d__bg, .h3d__speed, .h3d__sticker, .h3d__slam, .h3d__caption,
+  .h3d__actions, .h3d__hint, .h3d__name { animation: none !important; }
+  .h3d__slam { transform: none; }
+  .h3d__speed { opacity: 0.6; }
+  .h3d__sticker, .h3d__caption, .h3d__actions, .h3d__don { opacity: 1; visibility: visible; }
+  .h3d__role-text { transition: none; }
 }

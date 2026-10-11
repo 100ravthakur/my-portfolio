@@ -1,282 +1,199 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import "../App.css";
 
-/* ─────────────────────────────────────────
-   DATA
-───────────────────────────────────────── */
-const whmReasons = [
+gsap.registerPlugin(ScrollTrigger, SplitText);
+
+/* Each reason is backed by something on the CV.
+   sfx = manga sound effect drawn in the panel corner (decorative). */
+const REASONS = [
   {
-    id: 1,
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-    title: "Pixel-Perfect Execution",
-    desc: "I transform designs into flawless, responsive interfaces — every shadow, spacing, and micro-interaction exactly as intended.",
+    title: "Figma to pixel-accurate code",
+    desc: "Responsive builds for desktop, tablet and mobile, backed by a library of reusable React.js and Elementor components.",
+    sfx: "キラッ",
+    icon: <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />,
   },
   {
-    id: 2,
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-    title: "Performance Obsessed",
-    desc: "Fast loading, lazy loading, code splitting — I engineer experiences that feel instant on every device.",
+    title: "Core Web Vitals first",
+    desc: "Lazy loading, code splitting, caching and image optimization — with Lighthouse and Core Web Vitals as the benchmark.",
+    sfx: "シュッ",
+    icon: <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />,
   },
   {
-    id: 3,
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-        <path
-          d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-    title: "Animation & Motion",
-    desc: "From subtle hover states to complex scroll-driven narratives — motion that communicates and delights.",
+    title: "Web and mobile",
+    desc: "Built Naimo in React Native and Expo and took it through App Store and Google Play review.",
+    sfx: "ピコン",
+    icon: <><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M11 18h2" /></>,
   },
   {
-    id: 4,
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
-        <path
-          d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-    title: "Clear Communication",
-    desc: "Daily updates, clean documentation, and proactive problem-solving — you'll always know where the project stands.",
+    title: "Works well in a team",
+    desc: "Day-to-day with design, content, SEO and QC in an Agile setup, turning QC feedback around fast.",
+    sfx: "ワイワイ",
+    icon: <><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" /></>,
   },
   {
-    id: 5,
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <polyline
-          points="22 12 18 12 15 21 9 3 6 12 2 12"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-    title: "Deadline Reliable",
-    desc: "Delivering across freelance and full-time roles on schedule. Shipping on time isn't a goal — it's a standard.",
+    title: "Ships at agency pace",
+    desc: "Production work for 11 client brands and the frontend for 5+ full website revamps, from design handoff to go-live.",
+    sfx: "ドドド",
+    icon: <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />,
   },
   {
-    id: 6,
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-    title: "Clean, Scalable Code",
-    desc: "Modular components, semantic HTML — code your future teammates will actually enjoy inheriting.",
+    title: "SEO and security built in",
+    desc: "JSON-LD schema for Google and AI search, plus WordPress hardening — including securing a hacked site.",
+    sfx: "ガシッ",
+    icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
   },
 ];
 
-const whmStats = [
-  { value: "2+",  label: "Years Experience" },
-  { value: "4",   label: "Live Projects" },
-  { value: "90+", label: "Lighthouse Score" },
+const STATS = [
+  { value: 3,  suffix: "+", label: "years shipping" },
+  { value: 11, suffix: "",  label: "client brands" },
+  { value: 5,  suffix: "+", label: "site revamps" },
 ];
 
-/* ─────────────────────────────────────────
-   REASON ITEM
-───────────────────────────────────────── */
-function WhmReason({ data, index, visible }) {
-  return (
-    <div
-      className={`whm-reason ${visible ? "whm-reason--visible" : ""}`}
-      style={{ "--whm-delay": `${0.1 + index * 0.1}s` }}
-    >
-      <div className="whm-reason__icon">{data.icon}</div>
-      <div className="whm-reason__text">
-        <h3 className="whm-reason__title">{data.title}</h3>
-        <p className="whm-reason__desc">{data.desc}</p>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────
-   MAIN COMPONENT
-───────────────────────────────────────── */
-function WHM() {
+export default function WhyHireMe() {
   const sectionRef = useRef(null);
-  const imgRef     = useRef(null);
-  const contentRef = useRef(null);
-  const reasonRefs = useRef([]);
 
-  const [imgVis,     setImgVis]     = useState(false);
-  const [contentVis, setContentVis] = useState(false);
-  const [reasonVis,  setReasonVis]  = useState(
-    Array(whmReasons.length).fill(false)
-  );
-
+  /* ── Scroll-in: panels ink in, in reading order ── */
   useEffect(() => {
-    const observers = [];
+    const root = sectionRef.current;
+    if (!root) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const obs = (ref, setter) => {
-      if (!ref.current) return;
-      const o = new IntersectionObserver(
-        ([e]) => { if (e.isIntersecting) setter(true); },
-        { threshold: 0.2 }
-      );
-      o.observe(ref.current);
-      observers.push(o);
-    };
+    const ctx = gsap.context(() => {
+      const q = gsap.utils.selector(root);
+      if (reduced) { gsap.set(q(".wm-reveal"), { autoAlpha: 1 }); return; }
 
-    obs(imgRef, setImgVis);
-    obs(contentRef, setContentVis);
+      const split = SplitText.create(q(".wm-heading")[0], { type: "words,chars" });
+      gsap.timeline({ scrollTrigger: { trigger: root, start: "top 70%", once: true } })
+        .set(q(".wm-reveal"), { autoAlpha: 1 })
+        .from(q(".wm-chapter"), { autoAlpha: 0, y: -10, duration: 0.3 })
+        .from(split.chars, { yPercent: -120, rotationX: -90, autoAlpha: 0, stagger: 0.025, duration: 0.42, ease: "back.out(2)" }, "<")
+        .from(q(".wm-lead"), { autoAlpha: 0, y: 14, duration: 0.4 }, "-=0.2");
 
-    reasonRefs.current.forEach((el, i) => {
-      if (!el) return;
-      const o = new IntersectionObserver(
-        ([e]) => {
-          if (e.isIntersecting)
-            setReasonVis((prev) => {
-              const n = [...prev];
-              n[i] = true;
-              return n;
-            });
-        },
-        { threshold: 0.15 }
-      );
-      o.observe(el);
-      observers.push(o);
+      // wipe directions vary so the page feels hand-assembled
+      const wipes = [
+        "inset(0 0 100% 0)", "inset(0 100% 0 0)", "inset(0 0 0 100%)",
+        "inset(100% 0 0 0)", "inset(0 100% 0 0)", "inset(0 0 100% 0)",
+        "inset(0 0 0 100%)", "inset(100% 0 0 0)",
+      ];
+      const panels = q(".wm-panel");
+      const tl = gsap.timeline({ scrollTrigger: { trigger: q(".wm-page")[0], start: "top 75%", once: true } });
+      panels.forEach((p, i) => {
+        tl.fromTo(p, { clipPath: wipes[i % wipes.length] }, { clipPath: "inset(0 0 0 0)", duration: 0.5, ease: "power3.inOut" }, i * 0.12);
+      });
+      tl.from(q(".wm-figure img"), { scale: 1.35, duration: 1, ease: "power3.out" }, 0)
+        .from(q(".wm-sfx"), { scale: 2.4, rotation: -30, autoAlpha: 0, stagger: 0.08, duration: 0.35, ease: "back.out(3)" }, 0.5)
+        .from(q(".wm-stat"), { scale: 0, rotation: -60, stagger: 0.12, duration: 0.5, ease: "back.out(2.4)" }, 0.35);
+
+      // stats count up
+      q(".wm-stat__num").forEach((el) => {
+        const end = Number(el.dataset.value);
+        const suffix = el.dataset.suffix || "";
+        const o = { v: 0 };
+        tl.to(o, {
+          v: end, duration: 0.9, ease: "power2.out",
+          onUpdate: () => { el.textContent = Math.round(o.v) + suffix; },
+        }, 0.4);
+      });
+    }, root);
+
+    return () => ctx.revert();
+  }, []);
+
+  /* ── 3D: a panel lifts toward you and follows the cursor ── */
+  useEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduced) return;
+
+    const offs = [];
+    root.querySelectorAll(".wm-tilt").forEach((el) => {
+      const rx = gsap.quickTo(el, "rotationX", { duration: 0.45, ease: "power3.out" });
+      const ry = gsap.quickTo(el, "rotationY", { duration: 0.45, ease: "power3.out" });
+      const z  = gsap.quickTo(el, "z",         { duration: 0.45, ease: "power3.out" });
+      const move = (e) => {
+        const r = el.getBoundingClientRect();
+        ry(((e.clientX - r.left) / r.width - 0.5) * 12);
+        rx(-((e.clientY - r.top) / r.height - 0.5) * 12);
+        z(36);
+      };
+      const leave = () => { rx(0); ry(0); z(0); };
+      el.addEventListener("pointermove", move);
+      el.addEventListener("pointerleave", leave);
+      offs.push(() => { el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", leave); });
     });
-
-    return () => observers.forEach((o) => o.disconnect());
+    return () => offs.forEach((f) => f());
   }, []);
 
   return (
-    <section className="whm-section" ref={sectionRef} id="whyhireme">
-      {/* decorative background */}
-      <div className="whm-bg" aria-hidden="true">
-        <div className="whm-bg__blob whm-bg__blob--1" />
-        <div className="whm-bg__blob whm-bg__blob--2" />
-      </div>
+    <section className="wm" id="whyhireme" ref={sectionRef}>
+      <div className="wm__inner">
+        <header className="wm-head">
+          <p className="wm-chapter wm-reveal">
+            <span className="wm-chapter__jp" aria-hidden="true">第5話</span>
+            Why me
+          </p>
+          <h2 className="wm-heading wm-reveal">Why bring me on board.</h2>
+          <p className="wm-lead wm-reveal">
+            I care as much about Core Web Vitals, clean architecture and SEO as
+            about how an interface looks. Here's what that means in practice.
+          </p>
+        </header>
 
-      <div className="whm-container">
-
-        {/* ══ LEFT: IMAGE SIDE ══ */}
-        <div
-          className={`whm-img-side ${imgVis ? "whm-img-side--visible" : ""}`}
-          ref={imgRef}
-        >
-          <div className="whm-img-ring whm-img-ring--outer" />
-          <div className="whm-img-ring whm-img-ring--inner" />
-
-          <div className="whm-img-frame">
-            {/* ── Replace the src below with your own photo ── */}
-            <img src="/image/Asta.jpg" alt="Sourabh Bhaisare" className="whm-img" />
-
-            {/* Placeholder shown when no photo is provided */}
-            {/* <div className="whm-img-placeholder">
-              <div className="whm-initials">SB</div>
-              <span className="whm-initials-label">Sourabh Bhaisare</span>
-            </div> */}
-
-            <div className="whm-img-overlay" />
+        <div className="wm-page">
+          {/* lead panel: image + stat bursts */}
+          <div className="wm-cell wm-cell--figure">
+            <div className="wm-tilt">
+              <figure className="wm-panel wm-figure">
+                <img src="/image/Asta.jpg" alt="" loading="lazy" />
+                <span className="wm-figure__halftone" aria-hidden="true" />
+              </figure>
+              <ul className="wm-stats" aria-label="At a glance">
+                {STATS.map((s, i) => (
+                  <li className={`wm-stat wm-stat--${i + 1}`} key={s.label}>
+                    <span className="wm-stat__num" data-value={s.value} data-suffix={s.suffix}>
+                      {s.value}{s.suffix}
+                    </span>
+                    <span className="wm-stat__label">{s.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          {/* floating stat badges */}
-          {whmStats.map((s, i) => (
-            <div
-              className={`whm-stat whm-stat--${i + 1}`}
-              key={s.label}
-              style={{ "--whm-stat-delay": `${0.4 + i * 0.15}s` }}
-            >
-              <span className="whm-stat__value">{s.value}</span>
-              <span className="whm-stat__label">{s.label}</span>
+          {REASONS.map((r, i) => (
+            <div className={`wm-cell wm-cell--r${i + 1}`} key={r.title}>
+              <div className="wm-tilt">
+                <article className="wm-panel wm-reason">
+                  <span className="wm-sfx" aria-hidden="true"><span className="wm-sfx__text">{r.sfx}</span></span>
+                  <svg className="wm-icon" width="30" height="30" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    {r.icon}
+                  </svg>
+                  <h3 className="wm-reason__title">{r.title}</h3>
+                  <p className="wm-reason__desc">{r.desc}</p>
+                </article>
+              </div>
             </div>
           ))}
 
-          <div className="whm-img-corner whm-img-corner--tl" />
-          <div className="whm-img-corner whm-img-corner--br" />
-        </div>
-
-        {/* ══ RIGHT: CONTENT SIDE ══ */}
-        <div
-          className={`whm-content ${contentVis ? "whm-content--visible" : ""}`}
-          ref={contentRef}
-        >
-          <span className="whm-eyebrow">Why Work With Me</span>
-
-          <h2 className="whm-title">
-            The <span> Developer</span> Who Delivers Every Time
-          </h2>
-
-          <p className="whm-lead">
-            I'm not just a coder — I'm a craftsman who cares about the final
-            experience as much as you do. Here's what sets me apart:
-          </p>
-
-          <div className="whm-reasons">
-            {whmReasons.map((r, i) => (
-              <div key={r.id} ref={(el) => (reasonRefs.current[i] = el)}>
-                <WhmReason data={r} index={i} visible={reasonVis[i]} />
+          {/* closing panel */}
+          <div className="wm-cell wm-cell--cta">
+            <div className="wm-panel wm-cta">
+              <p className="wm-cta__line">Got a site or app to build?</p>
+              <div className="wm-cta__actions">
+                <a href="#contact" className="wm-btn wm-btn--primary">Let's work together</a>
+                <a href="#projects" className="wm-btn wm-btn--ghost">See my work</a>
               </div>
-            ))}
-          </div>
-
-          <div className={`whm-cta ${contentVis ? "whm-cta--visible" : ""}`}>
-            <a href="#contact" className="whm-cta__btn whm-cta__btn--primary">
-              <span>Let's Work Together</span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M3 8h10M9 4l4 4-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
-            <a href="#projects" className="whm-cta__btn whm-cta__btn--ghost">
-              View My Work
-            </a>
+            </div>
           </div>
         </div>
-
       </div>
     </section>
   );
 }
-
-export default WHM;

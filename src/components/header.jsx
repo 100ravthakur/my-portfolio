@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
+import gsap from "gsap";
 import "../header.css";
 import bgImage from "../assets/monkey-d-luffy.png"; 
 
@@ -15,15 +16,20 @@ const navLinks = [
 ];
 
 const ROLES = [
-  "Full-Stack Developer",
-  "React.js Specialist",
-  "UI/UX Enthusiast",
-  "Node.js Engineer",
-  "WordPress Expert",
+  "Frontend Developer",
+  "React.js Developer",
+  "React Native Developer",
+  "WordPress Developer",
+  "Web Developer",
 ];
 
-const TECH_CHIPS_LEFT  = ["React.js", "Node.js", "TypeScript", "Next.js"];
-const TECH_CHIPS_RIGHT = ["WordPress", "MongoDB", "Tailwind CSS", "REST APIs"];
+// Orbits the name in the hero's 3D ring
+const ORBIT = [
+  "React.js", "React Native", "JavaScript", "Node.js", "WordPress",
+  "HubSpot CMS", "Tailwind CSS", "MongoDB", "Firebase", "Core Web Vitals",
+];
+
+const CV = "/Sourabh-Bhaisare-CV.pdf";
 
 /* ─────────────────────────────────────────
    NAVBAR
@@ -138,14 +144,30 @@ function RoleTicker() {
   }, []);
 
   return (
-    <div className="hdr-role-wrap">
-      <div
-        className={`hdr-role-pill hdr-role-pill--${slide}`}
+    <p className="h3d__role">
+      <span className="h3d__role-label">Currently</span>
+      <span
+        className={`h3d__role-text h3d__role-text--${slide}`}
         style={{ opacity: visible ? 1 : 0 }}
       >
         {ROLES[index]}
-      </div>
-    </div>
+      </span>
+    </p>
+  );
+}
+
+/* ─────────────────────────────────────────
+   EXTRUDED 3D WORD — stacked layers give real depth when the scene tilts
+───────────────────────────────────────── */
+const DEPTH = 10;
+function Extruded({ text, variant }) {
+  return (
+    <span className={`h3d-word h3d-word--${variant}`} aria-hidden="true">
+      {Array.from({ length: DEPTH }, (_, i) => (
+        <span className="h3d-word__layer" style={{ "--z": DEPTH - i }} key={i}>{text}</span>
+      ))}
+      <span className="h3d-word__face">{text}</span>
+    </span>
   );
 }
 
@@ -153,154 +175,314 @@ function RoleTicker() {
    HEADER / HERO
 ───────────────────────────────────────── */
 function Header() {
-  const [loaded, setLoaded] = useState(false);
-  const particleRef = useRef(null);
+  const heroRef  = useRef(null);
+  const stageRef = useRef(null);
+  const bgRef    = useRef(null);
+  const nameRef  = useRef(null);
+  const itemRefs = useRef([]);
+  const introRef = useRef({ v: 0 });            // 0 → 1, fades the orbit in (driven by the GSAP timeline)
 
+  /* ── Load sequence: anime slam → hit-stop → impact frame → ドン → shake ── */
   useEffect(() => {
-    const t = setTimeout(() => setLoaded(true), 80);
-    return () => clearTimeout(t);
+    const hero = heroRef.current;
+    if (!hero) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const ctx = gsap.context(() => {
+      const q = gsap.utils.selector(hero);
+      if (reduced) {
+        gsap.set(q(".h3d__slam"), { clearProps: "transform" });
+        gsap.set(q(".h3d__sticker, .h3d__caption, .h3d__actions, .h3d__hint"), { autoAlpha: 1 });
+        gsap.set(q(".h3d__don"), { autoAlpha: 1, scale: 1, rotation: 12 });
+        gsap.set(q(".h3d__speed"), { autoAlpha: 0.6 });
+        introRef.current.v = 1;
+        return;
+      }
+
+      const slam = (target) => [
+        [target, { y: "-140vh", rotationX: 70, scale: 1.6 },
+                 { y: 0, rotationX: 0, scale: 1, duration: 0.36, ease: "power4.in" }],
+        // landing squash, then rubbery settle
+        [target, { scaleY: 0.82, scaleX: 1.08, transformOrigin: "50% 100%", duration: 0.05, ease: "none" }],
+        [target, { scaleY: 1, scaleX: 1, duration: 0.6, ease: "elastic.out(1, 0.35)" }],
+      ];
+
+      const tl = gsap.timeline({ delay: 0.25 });
+      const [a1, a2, a3] = slam(q(".h3d__slam--1"));
+      tl.fromTo(...a1).to(...a2).to(...a3);
+      const [b1, b2, b3] = slam(q(".h3d__slam--2"));
+      tl.fromTo(b1[0], b1[1], b1[2], 0.42).to(...b2);
+
+      tl.addLabel("impact")
+        // hit-stop: everything holds for a beat before the hit lands
+        .to({}, { duration: 0.08 })
+        // impact frame: inverted, desaturated, speed lines, ドン at full size
+        .set(hero, { filter: "grayscale(1) contrast(2.2) invert(1)" })
+        .set(q(".h3d__impact"), { visibility: "visible" })
+        .set(q(".h3d__don"), { autoAlpha: 1, scale: 2.4, rotation: -10 })
+        .to({}, { duration: 0.1 })
+        .set(q(".h3d__impact"), { visibility: "hidden" })
+        .set(hero, { clearProps: "filter" })
+        .to(b3[0], b3[1])
+        .to(q(".h3d__don"), { scale: 1, rotation: 12, duration: 0.5, ease: "back.out(2.6)" }, "<")
+        .fromTo(q(".h3d__name"), { x: 0, y: 0 }, {
+          keyframes: [{ x: -12, y: 6 }, { x: 10, y: -7 }, { x: -6, y: 4 }, { x: 3, y: -2 }, { x: 0, y: 0 }],
+          duration: 0.34, ease: "none",
+        }, "<")
+        .fromTo(q(".h3d__speed"), { autoAlpha: 0, scale: 0.55 }, { autoAlpha: 0.7, scale: 1, duration: 0.9, ease: "expo.out" }, "<")
+        .fromTo(q(".h3d__sticker"), { autoAlpha: 0, scale: 1.9, rotation: 14 },
+                                     { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.42, ease: "back.out(3)" }, "-=0.55")
+        .fromTo(q(".h3d__caption"), { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, "-=0.2")
+        .fromTo(q(".h3d__actions"), { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, "-=0.35")
+        .to(introRef.current, { v: 1, duration: 0.9, ease: "power2.out" }, "-=0.7")
+        .fromTo(q(".h3d__hint"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 }, "-=0.2");
+    }, hero);
+
+    return () => ctx.revert();
   }, []);
 
-  // Spawn floating particles
+  /* ── Rubber buttons: squash-and-stretch on hover, press down on click ── */
   useEffect(() => {
-    if (!loaded || !particleRef.current) return;
-    const container = particleRef.current;
-    for (let i = 0; i < 24; i++) {
-      const p = document.createElement("div");
-      p.className = "hdr-particle";
-      const size = 2 + Math.random() * 4;
-      const colors = ["255,107,53", "99,102,241", "34,197,94", "251,191,36"];
-      const color  = colors[Math.floor(Math.random() * colors.length)];
-      p.style.cssText = `
-        width:${size}px;
-        height:${size}px;
-        background:rgba(${color},${0.4 + Math.random() * 0.5});
-        left:${Math.random() * 100}%;
-        bottom:${Math.random() * 35}%;
-        animation-duration:${3 + Math.random() * 5}s;
-        animation-delay:${Math.random() * 5}s;
-      `;
-      container.appendChild(p);
+    const hero = heroRef.current;
+    if (!hero || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const btns = [...hero.querySelectorAll(".h3d__btn")];
+    const offs = [];
+    btns.forEach((b) => {
+      const enter = () => {
+        gsap.timeline()
+          .to(b, { scaleX: 1.14, scaleY: 0.86, duration: 0.09, ease: "power2.out" })
+          .to(b, { scaleX: 1, scaleY: 1, duration: 0.75, ease: "elastic.out(1.15, 0.28)" });
+      };
+      const down = () => gsap.to(b, { x: 5, y: 5, duration: 0.06, ease: "power2.out" });
+      const up   = () => gsap.to(b, { x: 0, y: 0, duration: 0.55, ease: "elastic.out(1, 0.4)" });
+      b.addEventListener("pointerenter", enter);
+      b.addEventListener("pointerdown", down);
+      b.addEventListener("pointerup", up);
+      b.addEventListener("pointerleave", up);
+      offs.push(() => {
+        b.removeEventListener("pointerenter", enter);
+        b.removeEventListener("pointerdown", down);
+        b.removeEventListener("pointerup", up);
+        b.removeEventListener("pointerleave", up);
+      });
+    });
+    return () => { offs.forEach((f) => f()); gsap.killTweensOf(btns); };
+  }, []);
+
+  /* Mouse tilt + orbiting stack + drag-to-spin, one rAF loop */
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    const target = { x: 0, y: 0 };
+    const cur    = { x: 0, y: 0 };
+    let angle = 0, prevAngle = 0, spin = 0;
+    let dragging = false, lastX = 0, raf = 0, running = true;
+    const start = performance.now();
+
+    // Ring geometry: wide ellipse around the name, front half passes below
+    // the letters and the back half passes above/behind them.
+    let geo = { rx: 500, ry: 150, rz: 260, cy: 0 };
+    const measure = () => {
+      const w = hero.clientWidth;
+      const nameEl = nameRef.current;
+      const nh = nameEl ? nameEl.offsetHeight / 2 : 120;
+      const nw = nameEl ? nameEl.querySelector(".h3d__name").offsetWidth / 2 : 400;
+      if (w < 640) {
+        // phones: a flat turntable spinning just below the name
+        const rx = w * 0.34;
+        geo = { rx, ry: 14, rz: rx * 0.7, cy: nh + 30 };
+      } else {
+        const rx = Math.min(Math.max(nw + 90, w * 0.34), w * 0.46);
+        geo = { rx, ry: nh + 34, rz: rx * 0.5, cy: 0 };
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    document.fonts?.ready.then(measure);
+
+    const placeItems = () => {
+      const { rx, ry, rz, cy } = geo;
+      const n = itemRefs.current.length;
+      const intro = introRef.current.v;
+      const dv = angle - prevAngle;                    // angular speed this frame
+      prevAngle = angle;
+      itemRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const th = angle + (i / n) * Math.PI * 2;
+        const x = Math.sin(th) * rx;
+        const z = Math.cos(th) * rz;
+        const y = cy + Math.cos(th) * ry;
+        const front = (Math.cos(th) + 1) / 2;          // 0 back … 1 front
+        el.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+        el.style.opacity = String((0.25 + 0.75 * front) * intro);
+        el.dataset.front = front > 0.5 ? "1" : "0";
+        // smear frame: fast spins leave a streak behind each label
+        const vx = Math.cos(th) * rx * dv;               // px moved sideways this frame
+        if (Math.abs(vx) > 3) {
+          const k = Math.min(Math.abs(vx), 40) * Math.sign(vx);
+          el.style.textShadow = `${-k * 0.6}px 0 0 rgba(246,196,69,.55), ${-k * 1.2}px 0 0 rgba(200,16,46,.35)`;
+          el.style.filter = `blur(${Math.min(Math.abs(vx) * 0.04, 1.6)}px)`;
+        } else if (el.style.textShadow) {
+          el.style.textShadow = "";
+          el.style.filter = "";
+        }
+      });
+    };
+
+    if (reduced) {
+      introRef.current.v = 1;
+      placeItems();
+      return () => window.removeEventListener("resize", measure);
     }
-    return () => { container.innerHTML = ""; };
-  }, [loaded]);
+
+    const onMove = (e) => {
+      const r = hero.getBoundingClientRect();
+      target.x = ((e.clientX - r.left) / r.width - 0.5) * 2;
+      target.y = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      if (dragging) {
+        const dx = e.clientX - lastX;
+        lastX = e.clientX;
+        angle += dx * 0.006;
+        spin = dx * 0.0009;
+      }
+    };
+    const onLeave = () => { target.x = 0; target.y = 0; dragging = false; };
+    const onDown = (e) => {
+      if (e.target.closest("a, button")) return;
+      dragging = true; lastX = e.clientX;
+      hero.classList.add("h3d--grabbing");
+    };
+    const onUp = () => { dragging = false; hero.classList.remove("h3d--grabbing"); };
+
+    hero.addEventListener("pointermove", onMove);
+    hero.addEventListener("pointerleave", onLeave);
+    hero.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointerup", onUp);
+
+    const loop = (now) => {
+      if (!running) return;
+      const t = now - start;
+
+      if (!finePointer) {                         // touch: gentle sway instead of mouse
+        target.x = Math.sin(t / 2600) * 0.45;
+        target.y = Math.cos(t / 3400) * 0.3;
+      }
+      cur.x += (target.x - cur.x) * 0.06;
+      cur.y += (target.y - cur.y) * 0.06;
+
+      if (stageRef.current) {
+        stageRef.current.style.transform =
+          `rotateX(${(-cur.y * 9).toFixed(3)}deg) rotateY(${(cur.x * 14).toFixed(3)}deg)`;
+      }
+      if (bgRef.current) {
+        bgRef.current.style.transform =
+          `translate3d(${(-cur.x * 28).toFixed(2)}px, ${(-cur.y * 18).toFixed(2)}px, 0) scale(1.1)`;
+      }
+
+      if (!dragging) {
+        angle += 0.0042 + spin;
+        spin *= 0.95;
+      }
+      placeItems();
+      raf = requestAnimationFrame(loop);
+    };
+
+    const io = new IntersectionObserver(([e]) => {
+      const vis = e.isIntersecting && !document.hidden;
+      if (vis && !running) { running = true; raf = requestAnimationFrame(loop); }
+      if (!vis) { running = false; cancelAnimationFrame(raf); }
+    });
+    io.observe(hero);
+    raf = requestAnimationFrame(loop);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      io.disconnect();
+      hero.removeEventListener("pointermove", onMove);
+      hero.removeEventListener("pointerleave", onLeave);
+      hero.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  const goTo = (e, id) => {
+    e.preventDefault();
+    document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <>
       <Navbar />
 
-      <section id="intro" className="hdr-section">
+      <section id="intro" ref={heroRef} className="h3d">
+        {/* ── Background: your image, parallaxed ── */}
+        <div className="h3d__bg" ref={bgRef} style={{ backgroundImage: `url(${bgImage})` }} aria-hidden="true" />
+        <div className="h3d__shade"    aria-hidden="true" />
+        <div className="h3d__speed"    aria-hidden="true" />
+        <div className="h3d__halftone" aria-hidden="true" />
 
-        {/* ── BG image layer ── */}
-        <div
-          className="hdr-bg-image"
-          style={{ backgroundImage: `url(${bgImage})` }}
-          aria-hidden="true"
-        />
+        <p className="h3d__vertical" aria-hidden="true">フロントエンド開発者</p>
 
-        {/* ── Overlays ── */}
-        <div className="hdr-overlay"    aria-hidden="true" />
-        <div className="hdr-vignette"   aria-hidden="true" />
-        <div className="hdr-grid-lines" aria-hidden="true" />
+        {/* ── 3D scene ── */}
+        <div className="h3d__scene">
+          <div className="h3d__stage" ref={stageRef}>
 
-        {/* ── Floating particles ── */}
-        <div className="hdr-particles" ref={particleRef} aria-hidden="true" />
-
-        {/* ── Tech chips LEFT ── */}
-        <div className="hdr-chips hdr-chips--left" aria-hidden="true">
-          {TECH_CHIPS_LEFT.map((chip, i) => (
-            <div
-              key={chip}
-              className="hdr-chip"
-              style={{
-                animationDuration:  `${3.2 + i * 0.4}s`,
-                animationDelay:     `${1.6 + i * 0.2}s`,
-              }}
-            >
-              {chip}
+            <div className="h3d__depth h3d__depth--sticker">
+              <p className="h3d__sticker">
+                <span className="h3d__sticker-dot" />
+                Open to work in Bengaluru
+              </p>
             </div>
-          ))}
-        </div>
 
-        {/* ── Tech chips RIGHT ── */}
-        <div className="hdr-chips hdr-chips--right" aria-hidden="true">
-          {TECH_CHIPS_RIGHT.map((chip, i) => (
-            <div
-              key={chip}
-              className="hdr-chip"
-              style={{
-                animationDuration:  `${3.5 + i * 0.35}s`,
-                animationDelay:     `${1.7 + i * 0.2}s`,
-              }}
-            >
-              {chip}
+            <div className="h3d__namewrap" ref={nameRef}>
+            <span className="h3d__don-wrap" aria-hidden="true"><span className="h3d__don">ドン</span></span>
+            <h1 className="h3d__name" aria-label="Sourabh Bhaisare">
+              <span className="h3d__slam h3d__slam--1"><Extruded text="SOURABH" variant="solid" /></span>
+              <span className="h3d__slam h3d__slam--2"><Extruded text="BHAISARE" variant="ink" /></span>
+            </h1>
+
+            <ul className="h3d__orbit" aria-label="Tech stack">
+              {ORBIT.map((tech, i) => (
+                <li className="h3d__orbit-item" key={tech} ref={(el) => (itemRefs.current[i] = el)}>
+                  {tech}
+                </li>
+              ))}
+            </ul>
             </div>
-          ))}
+
+            <div className="h3d__depth h3d__depth--caption">
+              <div className="h3d__caption">
+                <RoleTicker />
+                <p className="h3d__lead">
+                  I build fast, responsive websites and apps with React.js,
+                  React Native and WordPress — from Figma handoff to go&#8209;live.
+                </p>
+              </div>
+            </div>
+
+            <div className="h3d__depth h3d__depth--actions">
+              <div className="h3d__actions">
+                <a className="h3d__btn h3d__btn--primary" href="#projects" onClick={(e) => goTo(e, "#projects")}>
+                  See my work
+                </a>
+                <a className="h3d__btn h3d__btn--ghost" href={CV} download>
+                  Download CV
+                </a>
+              </div>
+            </div>
+
+          </div>
         </div>
 
-        {/* ══ HERO CONTENT ══ */}
-        <div className="hdr-content">
+        <p className="h3d__hint" aria-hidden="true">Drag to spin the stack</p>
 
-          {/* Badge */}
-          <div className={`hdr-badge ${loaded ? "hdr-badge--visible" : ""}`}>
-            <span className="hdr-badge__dot" />
-            Available for work — Bangalore, India
-          </div>
-
-          {/* Hi line */}
-          <p className={`hdr-hi ${loaded ? "hdr-hi--visible" : ""}`}>
-            Hi, I'm
-          </p>
-
-          {/* Name */}
-          <h1 className={`hdr-name ${loaded ? "hdr-name--visible" : ""}`}>
-            Sourabh<br />
-            <span className="hdr-name__accent">Bhaisare</span>
-          </h1>
-
-          {/* Role ticker */}
-          <div className={`hdr-ticker-wrap ${loaded ? "hdr-ticker-wrap--visible" : ""}`}>
-            <RoleTicker />
-          </div>
-
-          {/* Description */}
-          <p className={`hdr-desc ${loaded ? "hdr-desc--visible" : ""}`}>
-            Crafting fast, accessible &amp; beautifully designed web experiences
-            with React, Node.js &amp; modern tooling.
-          </p>
-
-          {/* CTAs */}
-          <div className={`hdr-actions ${loaded ? "hdr-actions--visible" : ""}`}>
-            <a
-              className="hdr-btn hdr-btn--primary"
-              href="#projects"
-              onClick={(e) => { e.preventDefault(); document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" }); }}
-            >
-              View My Work
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8"
-                  strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-            <a
-              className="hdr-btn hdr-btn--ghost"
-              href="#contact"
-              onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
-            >
-              Contact Me
-            </a>
-          </div>
-
-        </div>
-
-        {/* Scroll cue */}
-        <div className={`hdr-scroll-cue ${loaded ? "hdr-scroll-cue--visible" : ""}`}>
-          <div className="hdr-scroll-cue__arrows">
-            <span /><span />
-          </div>
-          <span className="hdr-scroll-cue__label">Scroll</span>
-        </div>
-
+        {/* impact frame: shown for ~0.1s when the name lands */}
+        <div className="h3d__impact" aria-hidden="true" />
       </section>
     </>
   );
