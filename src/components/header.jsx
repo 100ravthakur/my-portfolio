@@ -4,15 +4,15 @@ import "../header.css";
 import bgImage from "../assets/monkey-d-luffy.png"; 
 
 /* ─────────────────────────────────────────
-   NAV LINKS
+   NAV LINKS — numbered like the chapters they jump to
 ───────────────────────────────────────── */
 const navLinks = [
-  { label: "Home",       href: "#intro" },
-  { label: "Skills",     href: "#skills" },
-  { label: "Experience", href: "#experience" },
-  { label: "Projects",   href: "#projects" },
-  { label: "Why Me",     href: "#whyhireme" },
-  { label: "Contact",    href: "#contact" },
+  { label: "About",      href: "#about",      no: "01" },
+  { label: "Skills",     href: "#skills",     no: "02" },
+  { label: "Experience", href: "#experience", no: "03" },
+  { label: "Projects",   href: "#projects",   no: "04" },
+  { label: "Why me",     href: "#whyhireme",  no: "05" },
+  { label: "Contact",    href: "#contact",    no: "06" },
 ];
 
 const ROLES = [
@@ -36,85 +36,135 @@ const CV = "/Sourabh-Bhaisare-CV.pdf";
 ───────────────────────────────────────── */
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [active,   setActive]   = useState("#intro");
+  const [active,   setActive]   = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const progressRef = useRef(null);
+  const drawerRef   = useRef(null);
+  const burgerRef   = useRef(null);
 
+  /* scroll: solid bar, active chapter, reading progress */
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 40);
-      const sections = navLinks.map((l) => document.querySelector(l.href));
-      const idx = sections.reduce((acc, el, i) => {
-        if (!el) return acc;
-        return el.getBoundingClientRect().top <= 120 ? i : acc;
-      }, 0);
-      setActive(navLinks[idx]?.href || "#intro");
+      let current = "";
+      navLinks.forEach((l) => {
+        const el = document.querySelector(l.href);
+        if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.35) current = l.href;
+      });
+      setActive(current);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (progressRef.current) {
+        progressRef.current.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+      }
     };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
-  const handleLink = (href) => {
-    setActive(href);
+  /* phone menu: lock page scroll, close on Escape, animate chapters in */
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    if (!menuOpen) return;
+
+    const onKey = (e) => {
+      if (e.key === "Escape") { setMenuOpen(false); burgerRef.current?.focus(); }
+    };
+    window.addEventListener("keydown", onKey);
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const drawer = drawerRef.current;
+    const focusFirst = () => drawer?.querySelector("a")?.focus({ preventScroll: true });
+    let tl;
+    if (drawer && !reduced) {
+      const q = gsap.utils.selector(drawer);
+      tl = gsap.timeline({ onComplete: focusFirst })
+        .fromTo(drawer, { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 0.45, ease: "power4.inOut" })
+        .from(q(".nav-drawer__link"), { yPercent: -120, rotationX: -80, autoAlpha: 0, stagger: 0.05, duration: 0.4, ease: "back.out(2)" }, "-=0.15")
+        .from(q(".nav-drawer__foot > *"), { y: 20, autoAlpha: 0, stagger: 0.06, duration: 0.3 }, "-=0.2");
+    }
+    else focusFirst();
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      tl?.kill();
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  const go = (e, href) => {
+    e.preventDefault();
     setMenuOpen(false);
+    setActive(href);
     document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <nav className={`hdr-nav ${scrolled ? "hdr-nav--scrolled" : ""}`}>
-      <div className="hdr-nav__inner">
-        <a
-          className="hdr-nav__logo"
-          href="#intro"
-          onClick={(e) => { e.preventDefault(); handleLink("#intro"); }}
-        >
-          <span className="hdr-nav__logo-bracket">&lt;</span>
-          SB
-          <span className="hdr-nav__logo-bracket">/&gt;</span>
+    <nav className={`nav ${scrolled ? "nav--solid" : ""} ${menuOpen ? "nav--open" : ""}`} aria-label="Main">
+      <div className="nav__inner">
+        <a className="nav__logo" href="#intro" onClick={(e) => go(e, "#intro")} aria-label="Sourabh Bhaisare — back to top">
+          <span className="nav__logo-mark" aria-hidden="true">SB</span>
+          <span className="nav__logo-name">Sourabh Bhaisare</span>
         </a>
 
-        <ul className="hdr-nav__links">
+        <ul className="nav__links">
           {navLinks.map((l) => (
             <li key={l.href}>
               <a
-                className={`hdr-nav__link ${active === l.href ? "hdr-nav__link--active" : ""}`}
+                className={`nav__link ${active === l.href ? "nav__link--active" : ""}`}
                 href={l.href}
-                onClick={(e) => { e.preventDefault(); handleLink(l.href); }}
+                aria-current={active === l.href ? "location" : undefined}
+                onClick={(e) => go(e, l.href)}
               >
-                {l.label}
-                <span className="hdr-nav__link-dot" />
+                <span className="nav__no" aria-hidden="true">{l.no}</span>
+                <span className="nav__label">{l.label}</span>
               </a>
             </li>
           ))}
         </ul>
 
-        <a
-          className="hdr-nav__cta"
-          href="#contact"
-          onClick={(e) => { e.preventDefault(); handleLink("#contact"); }}
-        >
-          Hire Me
-        </a>
+        <a className="nav__cta" href="#contact" onClick={(e) => go(e, "#contact")}>Hire me</a>
 
         <button
-          className={`hdr-nav__burger ${menuOpen ? "hdr-nav__burger--open" : ""}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
+          ref={burgerRef}
+          type="button"
+          className="nav__burger"
+          aria-expanded={menuOpen}
+          aria-controls="nav-drawer"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          onClick={() => setMenuOpen((o) => !o)}
         >
           <span /><span /><span />
         </button>
       </div>
 
-      <div className={`hdr-nav__drawer ${menuOpen ? "hdr-nav__drawer--open" : ""}`}>
-        {navLinks.map((l) => (
-          <a
-            key={l.href}
-            className={`hdr-nav__drawer-link ${active === l.href ? "hdr-nav__drawer-link--active" : ""}`}
-            href={l.href}
-            onClick={(e) => { e.preventDefault(); handleLink(l.href); }}
-          >
-            {l.label}
-          </a>
-        ))}
+      <div className="nav__progress" aria-hidden="true"><span ref={progressRef} /></div>
+
+      {/* phone menu */}
+      <div id="nav-drawer" className="nav-drawer" ref={drawerRef} hidden={!menuOpen}>
+        <ul className="nav-drawer__list">
+          {navLinks.map((l) => (
+            <li key={l.href}>
+              <a
+                className={`nav-drawer__link ${active === l.href ? "nav-drawer__link--active" : ""}`}
+                href={l.href}
+                onClick={(e) => go(e, l.href)}
+              >
+                <span className="nav-drawer__no" aria-hidden="true">{l.no}</span>
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div className="nav-drawer__foot">
+          <a href="mailto:souravbhaisare2@gmail.com">souravbhaisare2@gmail.com</a>
+          <a href="https://wa.me/919516656752" target="_blank" rel="noopener noreferrer">WhatsApp +91 95166 56752</a>
+          <a href={CV} download>Download CV</a>
+        </div>
       </div>
     </nav>
   );
